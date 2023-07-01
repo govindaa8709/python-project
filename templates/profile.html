@@ -1,0 +1,151 @@
+{% extends 'base.html'%}
+{% block content %}
+{% include 'header.html'%}
+{% load static %}
+<div class="container profile my-3 py-4 px-3">
+    <div class="row ">
+        <h3 class="d-flex justify-content-end text-success">Hi 🖐🏻 {{request.user.first_name}}</h3>
+    </div>
+    {% for message in messages %}
+    <div class="alert alert-warning alert-dismissible fade show d-flex justify-content-center" role="alert">
+      <strong>Message ! </strong>{{ message }}
+    </div>
+    {%endfor%}
+    <div class="row profile-img my-3">
+        <div class="col-md-auto">
+          {% if user_img %}
+          <img src="{{user_img.profilePicture.url}}" alt="..." />
+          {%else%}
+          <img src="{% static 'image/profile.png'%}" alt="..." />
+          {%endif%}
+        </div>
+        <div class="col-md">
+        <h2>{{user.first_name | title}} {{user.last_name | title}}</h2>
+        </div>
+    </div>
+    <div>
+        <h4>Email: {{user.email}}</h4>
+    </div>
+    <div>
+        <h4>Username: {{user.username}}</h4>
+    </div>
+    {% if user_img.address and user_img.phone%}
+    <div>
+      <h4>Address: {{user_img.address}}</h4>
+  </div>
+  <div>
+    <h4>Phone Number: {{user_img.phone}}</h4>
+</div>
+{%endif%}
+<div class="row my-3">
+  <div class="col-md-6 ">
+    {% if not user_img %}
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+          Add Picture
+        </button>
+      {%endif%}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changePassword">
+          Change Password
+        </button>
+  </div>
+  <div class="col-md-6 text-end">
+    <a href="/user_bids" class="btn btn-info">Check my Bids</a>
+  </div>
+ 
+</div>
+    
+    
+      
+      <!-- Modal -->
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Add Picture</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form enctype="multipart/form-data" action="/addProfile/{{request.user.id}}" method="post" class="needs-validation" novalidate >
+            <div class="modal-body">
+                 {% csrf_token %}
+                 <input type="hidden" name="id" value="{{request.user.id}}">
+                 <div>
+                  <input type="file" class="form-control" name="profilePicture" required>
+                  <div class="invalid-feedback">
+                    Please provide a image.
+                  </div>
+                 </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="changePassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Change Password</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formP" action="/changePassword/{{request.user.id}}" method="POST" class="needs-validation" novalidate>
+            <div class="modal-body">
+                 {% csrf_token %}
+                 <div class="form-floating my-3">
+                  <input type="password" name="newPassword" id="floatingNewPassword" class="form-control" placeholder="New Password" required>
+                  <label for="floatingPassword" class="form-label">New Password</label>
+                  <div class="invalid-feedback">
+                    Please provide a valid Password.
+                  </div>
+                  <small class="text-danger" id="small"></small>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+</div>
+<script>
+  const password = document.getElementById('floatingNewPassword');
+  const form = document.getElementById('formP');
+  const small = document.getElementById('small');
+
+  form.addEventListener('submit',(e)=>{
+   if(password.value.length < 5){
+    e.preventDefault()
+    small.innerHTML="Password must have atleat 5 letters.";
+    document.getElementById('floatingNewPassword').classList.add("error")
+   }
+
+  });
+
+</script>
+{% include 'use.html'%}
+
+{%endblock%}
